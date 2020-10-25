@@ -6,11 +6,11 @@
 ## General
 
 > - Allowed editors: vi, vim, emacs
-> - All your files will be interpreted/compiled on Ubuntu 18.04 LTS using python3 (version 3.7)(version 3.4.3)
+> - All your files will be interpreted/compiled on Ubuntu 14.04 LTS using python3 (version 3.4.3)
 > - All your files should end with a new line
 > - The first line of all your files should be exactly #!/usr/bin/env python3
 > - A README.md file, at the root of the folder of the project, is mandatory
-> - Your code should use the pycodestyle style (version 2.5.)
+> - Your code should use the PEP 8 style (version 1.7.*)
 > - All your files must be executable
 > - The length of your files will be tested using wc
 > - All your modules should have a documentation (python3 -c 'print(__import__("my_module").__doc__)')
@@ -18,90 +18,607 @@
 > - All your functions (inside and outside a class) should have a documentation (python3 -c 'print(__import__("my_module").my_function.__doc__)' and python3 -c 'print(__import__("my_module").MyClass.my_function.__doc__)')
 
 
+# More Info
+
+## Parent class BaseCaching
+
+All your classes must inherit from BaseCaching defined below:
+
+```sh
+$ cat base_caching.py
+#!/usr/bin/python3
+""" BaseCaching module
+"""
+
+class BaseCaching():
+    """ BaseCaching defines:
+      - constants of your caching system
+      - where your data are stored (in a dictionary)
+    """
+    MAX_ITEMS = 4
+
+    def __init__(self):
+        """ Initiliaze
+        """
+        self.cache_data = {}
+
+    def print_cache(self):
+        """ Print the cache
+        """
+        print("Current cache:")
+        for key in sorted(self.cache_data.keys()):
+            print("{}: {}".format(key, self.cache_data.get(key)))
+
+    def put(self, key, item):
+        """ Add an item in the cache
+        """
+        raise NotImplementedError("put must be implemented in your cache class")
+
+    def get(self, key):
+        """ Get an item by key
+        """
+        raise NotImplementedError("get must be implemented in your cache class")
+```
+
 ## Task
 
-**0. Async Generator**
+**0. Basic dictionary**
 
-File: [0-main.py](0-main.py/) - [0-async_generator.py](0-async_generator.py/)
+File: [0-main.py](0-main.py/) - [0-basic_cache.py](0-basic_cache.py/)
 
-Write a coroutine called async_generator that takes no arguments.
+Create a class BasicCache that inherits from BaseCaching and is a caching system:
 
-The coroutine will loop 10 times, each time asynchronously wait 1 second, then yield a random number between 0 and 10. Use the random module.
+- You must use self.cache_data - dictionary from the parent class BaseCaching
+- This caching system doesn’t have limit
+- def put(self, key, item):
+> - Must assign to the dictionary self.cache_data the item value for the key key.
+> - If key or item is None, this method should not do anything.
+
+- def get(self, key):
+> - Must return the value in self.cache_data linked to key.
+> - If key is None or if the key doesn’t exist in self.cache_data, return None.
 
 ```sh
-user@ubuntu-bionic:~/holbertonschool-web_stack_programming/0x02-python_async_comprehension$ cat 0-main.py
-#!/usr/bin/env python3
+guillaume@ubuntu:~/0x03$ cat 0-main.py
+#!/usr/bin/python3
+""" 0-main """
+BasicCache = __import__('0-basic_cache').BasicCache
 
-import asyncio
+my_cache = BasicCache()
+my_cache.print_cache()
+my_cache.put("A", "Hello")
+my_cache.put("B", "World")
+my_cache.put("C", "Holberton")
+my_cache.print_cache()
+print(my_cache.get("A"))
+print(my_cache.get("B"))
+print(my_cache.get("C"))
+print(my_cache.get("D"))
+my_cache.print_cache()
+my_cache.put("D", "School")
+my_cache.put("E", "Battery")
+my_cache.put("A", "Street")
+my_cache.print_cache()
+print(my_cache.get("A"))
 
-async_generator = __import__('0-async_generator').async_generator
-
-async def print_yielded_values():
-    result = []
-    async for i in async_generator():
-        result.append(i)
-    print(result)
-
-asyncio.run(print_yielded_values())
-
-user@ubuntu-bionic:~/holbertonschool-web_stack_programming/0x02-python_async_comprehension$ ./0-main.py
-[4.403136952967102, 6.9092712604587465, 6.293445466782645, 4.549663490048418, 4.1326571686139015, 9.99058525304903, 6.726734105473811, 9.84331704602206, 1.0067279479988345, 1.3783306401737838]
+guillaume@ubuntu:~/0x03$ ./0-main.py
+Current cache:
+Current cache:
+A: Hello
+B: World
+C: Holberton
+Hello
+World
+Holberton
+None
+Current cache:
+A: Hello
+B: World
+C: Holberton
+Current cache:
+A: Street
+B: World
+C: Holberton
+D: School
+E: Battery
+Street
+guillaume@ubuntu:~/0x03$ 
 ```
 
 
-**1. Async Comprehensions**
+**1. FIFO caching**
 
-File: [1-main.py](1-main.py/) - [1-async_comprehension.py](1-async_comprehension.py/)
+File: [1-main.py](1-main.py/) - [1-fifo_cache.py](1-fifo_cache.py/)
 
-Import async_generator from the previous task and then write a coroutine called async_comprehension that takes no arguments.
+Create a class FIFOCache that inherits from BaseCaching and is a caching system:
 
-The coroutine will collect 10 random numbers using an async comprehensing over async_generator, then return the 10 random numbers.
+- You must use self.cache_data - dictionary from the parent class BaseCaching
+- You can overload def __init__(self): but don’t forget to call the parent init: super().__init__()
+- def put(self, key, item):
+> - Must assign to the dictionary self.cache_data the item value for the key key.
+> - If key or item is None, this method should not do anything.
+> - If the number of items in self.cache_data is higher that BaseCaching.MAX_ITEMS:
+> > - you must discard the first item put in cache (FIFO algorithm)
+> > -you must print DISCARD: with the key discarded and following by a new line
+- def get(self, key):
+> - Must return the value in self.cache_data linked to key.
+> - If key is None or if the key doesn’t exist in self.cache_data, return None.
+
 
 ```sh
-vagrant@ubuntu-bionic:/vagrant/holberton_development/curriculum-specialization-backend/0x02-Python_async_comprehension$ cat 1-main.py
-#!/usr/bin/env python3
+guillaume@ubuntu:~/0x03$ cat 1-main.py
+#!/usr/bin/python3
+""" 1-main """
+FIFOCache = __import__('1-fifo_cache').FIFOCache
 
-import asyncio
+my_cache = FIFOCache()
+my_cache.put("A", "Hello")
+my_cache.put("B", "World")
+my_cache.put("C", "Holberton")
+my_cache.put("D", "School")
+my_cache.print_cache()
+my_cache.put("E", "Battery")
+my_cache.print_cache()
+my_cache.put("C", "Street")
+my_cache.print_cache()
+my_cache.put("F", "Mission")
+my_cache.print_cache()
 
-async_comprehension = __import__('1-async_comprehension').async_comprehension
-
-
-async def main():
-    print(await async_comprehension())
-
-asyncio.run(main())
-
-vagrant@ubuntu-bionic:/vagrant/holberton_development/curriculum-specialization-backend/0x02-Python_async_comprehension$ ./1-main.py
-[9.861842105071727, 8.572355293354995, 1.7467182056248265, 4.0724372912858575, 0.5524750922145316, 8.084266576021555, 8.387128918690468, 1.5486451376520916, 7.713335177885325, 7.673533267041574]
+guillaume@ubuntu:~/0x03$ ./1-main.py
+Current cache:
+A: Hello
+B: World
+C: Holberton
+D: School
+DISCARD: A
+Current cache:
+B: World
+C: Holberton
+D: School
+E: Battery
+Current cache:
+B: World
+C: Street
+D: School
+E: Battery
+DISCARD: B
+Current cache:
+C: Street
+D: School
+E: Battery
+F: Mission
+guillaume@ubuntu:~/0x03$ 
 ```
 
-**2. Run time for four parallel comprehensions**
+**2. LIFO Caching**
 
-File: [2-main.py](2-main.py/) - [2-measure_runtime.py](2-measure_runtime.py/)
+File: [2-main.py](2-main.py/) - [2-lifo_cache.py](2-lifo_cache.py/)
 
-Import async_comprehension from the previous file and write a measure_runtime coroutine that will execute async_comprehension four times in parallel using asyncio.gather.
+Create a class LIFOCache that inherits from BaseCaching and is a caching system:
 
-measure_runtime should measure the total runtime and return it.
-
-Notice that the total runtime is roughly 10 seconds, explain it to yourself.
+- You must use self.cache_data - dictionary from the parent class BaseCaching
+- You can overload def __init__(self): but don’t forget to call the parent init: super().__init__()
+- def put(self, key, item):
+> - Must assign to the dictionary self.cache_data the item value for the key key.
+> - If key or item is None, this method should not do anything.
+> - If the number of items in self.cache_data is higher that BaseCaching.MAX_ITEMS:
+> > - you must discard the last item put in cache (LIFO algorithm)
+> > - you must print DISCARD: with the key discarded and following by a new line
+- def get(self, key):
+> - Must return the value in self.cache_data linked to key.
+> - If key is None or if the key doesn’t exist in self.cache_data, return None.
 
 ```sh
-vagrant@ubuntu-bionic:/vagrant/holberton_development/curriculum-specialization-backend/0x02-Python_async_comprehension$ cat 2-main.py
-#!/usr/bin/env python3
+guillaume@ubuntu:~/0x03$ cat 2-main.py
+#!/usr/bin/python3
+""" 2-main """
+LIFOCache = __import__('2-lifo_cache').LIFOCache
 
-import asyncio
+my_cache = LIFOCache()
+my_cache.put("A", "Hello")
+my_cache.put("B", "World")
+my_cache.put("C", "Holberton")
+my_cache.put("D", "School")
+my_cache.print_cache()
+my_cache.put("E", "Battery")
+my_cache.print_cache()
+my_cache.put("C", "Street")
+my_cache.print_cache()
+my_cache.put("F", "Mission")
+my_cache.print_cache()
+my_cache.put("G", "San Francisco")
+my_cache.print_cache()
 
+guillaume@ubuntu:~/0x03$ ./2-main.py
+Current cache:
+A: Hello
+B: World
+C: Holberton
+D: School
+DISCARD: D
+Current cache:
+A: Hello
+B: World
+C: Holberton
+E: Battery
+Current cache:
+A: Hello
+B: World
+C: Street
+E: Battery
+DISCARD: C
+Current cache:
+A: Hello
+B: World
+E: Battery
+F: Mission
+DISCARD: F
+Current cache:
+A: Hello
+B: World
+E: Battery
+G: San Francisco
+guillaume@ubuntu:~/0x03$ 
+```
 
-measure_runtime = __import__('2-measure_runtime').measure_runtime
+**3. LRU Caching**
 
+File: [3-main.py](3-main.py/) - [3-lru_cache.py](3-lru_cache.py/)
 
-async def main():
-    return await(measure_runtime())
+Create a class LRUCache that inherits from BaseCaching and is a caching system:
 
-print(
-    asyncio.run(main())
-)
+- You must use self.cache_data - dictionary from the parent class BaseCaching
+- You can overload def __init__(self): but don’t forget to call the parent init: super().__init__()
+- def put(self, key, item):
+> - Must assign to the dictionary self.cache_data the item value for the key key.
+> - If key or item is None, this method should not do anything.
+> - If the number of items in self.cache_data is higher that BaseCaching.MAX_ITEMS:
+> > - you must discard the least recently used item (LRU algorithm)
+> > - you must print DISCARD: with the key discarded and following by a new line
+- def get(self, key):
+> - Must return the value in self.cache_data linked to key.
+> - If key is None or if the key doesn’t exist in self.cache_data, return None.
 
-vagrant@ubuntu-bionic:/vagrant/holberton_development/curriculum-specialization-backend/0x02-Python_async_comprehension$ ./2-main.py
-10.021936893463135
+```sh
+guillaume@ubuntu:~/0x03$ cat 3-main.py
+#!/usr/bin/python3
+""" 3-main """
+LRUCache = __import__('3-lru_cache').LRUCache
+
+my_cache = LRUCache()
+my_cache.put("A", "Hello")
+my_cache.put("B", "World")
+my_cache.put("C", "Holberton")
+my_cache.put("D", "School")
+my_cache.print_cache()
+print(my_cache.get("B"))
+my_cache.put("E", "Battery")
+my_cache.print_cache()
+my_cache.put("C", "Street")
+my_cache.print_cache()
+print(my_cache.get("A"))
+print(my_cache.get("B"))
+print(my_cache.get("C"))
+my_cache.put("F", "Mission")
+my_cache.print_cache()
+my_cache.put("G", "San Francisco")
+my_cache.print_cache()
+my_cache.put("H", "H")
+my_cache.print_cache()
+my_cache.put("I", "I")
+my_cache.print_cache()
+my_cache.put("J", "J")
+my_cache.print_cache()
+my_cache.put("K", "K")
+my_cache.print_cache()
+
+guillaume@ubuntu:~/0x03$ ./3-main.py
+Current cache:
+A: Hello
+B: World
+C: Holberton
+D: School
+World
+DISCARD: A
+Current cache:
+B: World
+C: Holberton
+D: School
+E: Battery
+Current cache:
+B: World
+C: Street
+D: School
+E: Battery
+None
+World
+Street
+DISCARD: D
+Current cache:
+B: World
+C: Street
+E: Battery
+F: Mission
+DISCARD: E
+Current cache:
+B: World
+C: Street
+F: Mission
+G: San Francisco
+DISCARD: B
+Current cache:
+C: Street
+F: Mission
+G: San Francisco
+H: H
+DISCARD: C
+Current cache:
+F: Mission
+G: San Francisco
+H: H
+I: I
+DISCARD: F
+Current cache:
+G: San Francisco
+H: H
+I: I
+J: J
+DISCARD: G
+Current cache:
+H: H
+I: I
+J: J
+K: K
+guillaume@ubuntu:~/0x03$ 
+```
+
+**4. MRU Caching**
+
+File: [4-main.py](4-main.py/) - [4-mru_cache.py](4-mru_cache.py/)
+
+Create a class MRUCache that inherits from BaseCaching and is a caching system:
+
+- You must use self.cache_data - dictionary from the parent class BaseCaching
+- You can overload def __init__(self): but don’t forget to call the parent init: super().__init__()
+- def put(self, key, item):
+> - Must assign to the dictionary self.cache_data the item value for the key key.
+> - If key or item is None, this method should not do anything.
+> - If the number of items in self.cache_data is higher that BaseCaching.MAX_ITEMS:
+> > - you must discard the most recently used item (MRU algorithm)
+> > - you must print DISCARD: with the key discarded and following by a new line
+- def get(self, key):
+> - Must return the value in self.cache_data linked to key.
+> - If key is None or if the key doesn’t exist in self.cache_data, return None.
+
+```sh
+guillaume@ubuntu:~/0x03$ cat 4-main.py
+#!/usr/bin/python3
+""" 4-main """
+MRUCache = __import__('4-mru_cache').MRUCache
+
+my_cache = MRUCache()
+my_cache.put("A", "Hello")
+my_cache.put("B", "World")
+my_cache.put("C", "Holberton")
+my_cache.put("D", "School")
+my_cache.print_cache()
+print(my_cache.get("B"))
+my_cache.put("E", "Battery")
+my_cache.print_cache()
+my_cache.put("C", "Street")
+my_cache.print_cache()
+print(my_cache.get("A"))
+print(my_cache.get("B"))
+print(my_cache.get("C"))
+my_cache.put("F", "Mission")
+my_cache.print_cache()
+my_cache.put("G", "San Francisco")
+my_cache.print_cache()
+my_cache.put("H", "H")
+my_cache.print_cache()
+my_cache.put("I", "I")
+my_cache.print_cache()
+my_cache.put("J", "J")
+my_cache.print_cache()
+my_cache.put("K", "K")
+my_cache.print_cache()
+
+guillaume@ubuntu:~/0x03$ ./4-main.py
+Current cache:
+A: Hello
+B: World
+C: Holberton
+D: School
+World
+DISCARD: B
+Current cache:
+A: Hello
+C: Holberton
+D: School
+E: Battery
+Current cache:
+A: Hello
+C: Street
+D: School
+E: Battery
+Hello
+None
+Street
+DISCARD: C
+Current cache:
+A: Hello
+D: School
+E: Battery
+F: Mission
+DISCARD: F
+Current cache:
+A: Hello
+D: School
+E: Battery
+G: San Francisco
+DISCARD: G
+Current cache:
+A: Hello
+D: School
+E: Battery
+H: H
+DISCARD: H
+Current cache:
+A: Hello
+D: School
+E: Battery
+I: I
+DISCARD: I
+Current cache:
+A: Hello
+D: School
+E: Battery
+J: J
+DISCARD: J
+Current cache:
+A: Hello
+D: School
+E: Battery
+K: K
+guillaume@ubuntu:~/0x03$ 
+```
+
+**5. LFU Caching**
+
+File: [100-main.py](100-main.py/) - [100-lfu_cache.py](100-lfu_cache.py/)
+
+Create a class LFUCache that inherits from BaseCaching and is a caching system:
+
+- You must use self.cache_data - dictionary from the parent class BaseCaching
+- You can overload def __init__(self): but don’t forget to call the parent init: super().__init__()
+- def put(self, key, item):
+> - Must assign to the dictionary self.cache_data the item value for the key key.
+> - If key or item is None, this method should not do anything.
+> - If the number of items in self.cache_data is higher that BaseCaching.MAX_ITEMS:
+> > - you must discard the least frequency used item (LFU algorithm)
+> > - if you find more than 1 item to discard, you must use the LRU algorithm to discard only the least recently used
+> > - you must print DISCARD: with the key discarded and following by a new line
+- def get(self, key):
+> - Must return the value in self.cache_data linked to key.
+> - If key is None or if the key doesn’t exist in self.cache_data, return None.
+
+```sh
+guillaume@ubuntu:~/0x03$ cat 100-main.py
+#!/usr/bin/python3
+""" 100-main """
+LFUCache = __import__('100-lfu_cache').LFUCache
+
+my_cache = LFUCache()
+my_cache.put("A", "Hello")
+my_cache.put("B", "World")
+my_cache.put("C", "Holberton")
+my_cache.put("D", "School")
+my_cache.print_cache()
+print(my_cache.get("B"))
+my_cache.put("E", "Battery")
+my_cache.print_cache()
+my_cache.put("C", "Street")
+my_cache.print_cache()
+print(my_cache.get("A"))
+print(my_cache.get("B"))
+print(my_cache.get("C"))
+my_cache.put("F", "Mission")
+my_cache.print_cache()
+my_cache.put("G", "San Francisco")
+my_cache.print_cache()
+my_cache.put("H", "H")
+my_cache.print_cache()
+my_cache.put("I", "I")
+my_cache.print_cache()
+print(my_cache.get("I"))
+print(my_cache.get("H"))
+print(my_cache.get("I"))
+print(my_cache.get("H"))
+print(my_cache.get("I"))
+print(my_cache.get("H"))
+my_cache.put("J", "J")
+my_cache.print_cache()
+my_cache.put("K", "K")
+my_cache.print_cache()
+my_cache.put("L", "L")
+my_cache.print_cache()
+my_cache.put("M", "M")
+my_cache.print_cache()
+
+guillaume@ubuntu:~/0x03$ ./100-main.py
+Current cache:
+A: Hello
+B: World
+C: Holberton
+D: School
+World
+DISCARD: A
+Current cache:
+B: World
+C: Holberton
+D: School
+E: Battery
+Current cache:
+B: World
+C: Street
+D: School
+E: Battery
+None
+World
+Street
+DISCARD: D
+Current cache:
+B: World
+C: Street
+E: Battery
+F: Mission
+DISCARD: E
+Current cache:
+B: World
+C: Street
+F: Mission
+G: San Francisco
+DISCARD: F
+Current cache:
+B: World
+C: Street
+G: San Francisco
+H: H
+DISCARD: G
+Current cache:
+B: World
+C: Street
+H: H
+I: I
+I
+H
+I
+H
+I
+H
+DISCARD: B
+Current cache:
+C: Street
+H: H
+I: I
+J: J
+DISCARD: J
+Current cache:
+C: Street
+H: H
+I: I
+K: K
+DISCARD: K
+Current cache:
+C: Street
+H: H
+I: I
+L: L
+DISCARD: L
+Current cache:
+C: Street
+H: H
+I: I
+M: M
+guillaume@ubuntu:~/0x03$ 
 ```
