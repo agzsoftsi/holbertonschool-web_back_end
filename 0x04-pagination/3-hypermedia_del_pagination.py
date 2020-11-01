@@ -2,7 +2,7 @@
 """
 Description: The goal here is that if between two queries, certain rows are
              removed from the dataset, the user does not miss items from
-             dataset when changing page.         
+             dataset when changing page
 """
 
 import csv
