@@ -22,6 +22,8 @@ from typing import List
 def filter_datum(fields: List[str], redaction: str, message: str,
                  separator: str) -> str:
     ''' Return `message` with personally identifiable information redacted. '''
-    regex = r'(\w+)=([\w\-.]+@*[\w\-.]+)'
-    return sub(regex, lambda x: x.group(1) + '=' + redaction
-               if x.group(1) in fields else x.group(), message)
+
+    for i in fields:
+        message = re.sub(i'{i}=.*?{separator}', i'{i}={redaction}{separator}',
+                         message)
+    return message
