@@ -94,7 +94,7 @@ def get_logger() -> logging.Logger:
     return log
 
 
-def get_db():
+def get_db() -> mysql.connector.connection.MySQLConnection:
     ''' Description: you will connect to a secure holberton database to read a
                      users table. The database is protected by a username and
                      password that are set as environment variables on the
