@@ -112,7 +112,7 @@ def get_db():
            - Use the module mysql-connector-python to connect to the MySQL
              database (pip3 install mysql-connector-python)
     '''
-    connection_db = mysql.connector.connect(
+    connection_db = mysql.connector.connection.MySQLConnection(
         user=getenv('PERSONAL_DATA_DB_USERNAME', 'root'),
         password=getenv('PERSONAL_DATA_DB_PASSWORD', ''),
         host=getenv('PERSONAL_DATA_DB_HOST', 'localhost'),
