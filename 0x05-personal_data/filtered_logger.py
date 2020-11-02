@@ -3,6 +3,7 @@
     1. Log formatter: class RedactingFormatter
     2. Create logger
     3. Connect to secure database
+    4. Read and filter data
 '''
 
 import re
@@ -119,3 +120,38 @@ def get_db() -> mysql.connector.connection.MySQLConnection:
         database=getenv('PERSONAL_DATA_DB_NAME'))
 
     return connection_db
+
+
+def main():
+    '''
+        Description: Implement a main function that takes no arguments and
+                     returns nothing.
+
+        The function will obtain a database connection using get_db and
+        retrieve all rows in the users table and display each row under a
+        filtered format
+
+        Filtered fields:
+                          name
+                          email
+                          phone
+                          ssn
+                          password
+    '''
+    database = get_db()
+    cursor = database.cursor()
+    cursor.execute("SELECT * FROM users;")
+    fields = [i[0] for i in cursor.description]
+
+    log = get_logger()
+
+    for row in cursor:
+        str_row = ''.join(f'{f}={str(r)}; ' for r, f in zip(row, fields))
+        log.info(str_row.strip())
+
+    cursor.close()
+    database.close()
+
+
+if __name__ == '__main__':
+    main()
