@@ -2,11 +2,14 @@
 ''' 0. Regex-ing: filter_datum
     1. Log formatter: class RedactingFormatter
     2. Create logger
+    3. Connect to secure database
 '''
 
 import re
 from typing import List
 import logging
+import mysql.connector
+from os import getenv
 
 
 PII_FIELDS = ('name', 'email', 'phone', 'ssn', 'password')
@@ -89,3 +92,30 @@ def get_logger() -> logging.Logger:
     log.addHandler(sh)
 
     return log
+
+
+def get_db():
+    ''' Description: you will connect to a secure holberton database to read a
+                     users table. The database is protected by a username and
+                     password that are set as environment variables on the
+                     server named PERSONAL_DATA_DB_USERNAME (set the default as
+                     "root"), PERSONAL_DATA_DB_PASSWORD (set the default as an
+                     empty string) and PERSONAL_DATA_DB_HOST (set the default
+                     as "localhost").
+
+        The database name is stored in PERSONAL_DATA_DB_NAME.
+
+        Implement a get_db function that returns a connector to the database
+        (mysql.connector.connection.MySQLConnection object).
+
+           - Use the os module to obtain credentials from the environment
+           - Use the module mysql-connector-python to connect to the MySQL
+             database (pip3 install mysql-connector-python)
+    '''
+    connection_db = mysql.connector.connect(
+        user=getenv('PERSONAL_DATA_DB_USERNAME', 'root'),
+        password=getenv('PERSONAL_DATA_DB_PASSWORD', ''),
+        host=getenv('PERSONAL_DATA_DB_HOST', 'localhost'),
+        database=getenv('PERSONAL_DATA_DB_NAME'))
+
+    return connection_db
