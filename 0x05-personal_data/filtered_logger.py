@@ -15,7 +15,7 @@
    the substitution with a single regex.
 '''
 
-from re import sub
+import re
 from typing import List
 
 
@@ -24,6 +24,7 @@ def filter_datum(fields: List[str], redaction: str, message: str,
     ''' Return `message` with personally identifiable information redacted. '''
 
     for i in fields:
-        message = re.sub(i'{i}=.*?{separator}', i'{i}={redaction}{separator}',
+        message = re.sub(i + "=.*?" + separator,
+                         i + "=" + redaction + separator,
                          message)
     return message
