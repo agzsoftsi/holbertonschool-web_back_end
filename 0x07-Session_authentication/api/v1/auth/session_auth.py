@@ -31,12 +31,12 @@ class SessionAuth(Auth):
         ''' Returns a User instance based on a cookie value '''
 
         session_id = self.session_cookie(request)
-        print(session_id)
+        # print(session_id)
         if session_id is None:
             return None
 
         user_id = self.user_id_for_session_id(session_id)
-        print(user_id)
+        # print(user_id)
 
         return User.get(user_id)
 
@@ -55,6 +55,9 @@ class SessionAuth(Auth):
         if not user_id:
             return False
 
-        del self.user_id_by_session_id[session_id]
+        try:
+            del self.user_id_by_session_id[session_id]
+        except Exception:
+            pass
 
         return True
