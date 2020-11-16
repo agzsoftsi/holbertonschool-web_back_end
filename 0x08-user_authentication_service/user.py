@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 """Class User for ORM"""
 
 from sqlalchemy import Column, Integer, String
