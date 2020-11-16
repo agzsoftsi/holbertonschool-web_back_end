@@ -3,7 +3,7 @@
 
 from db import DB
 from user import User
-from bcrypt import hashpw, gensalt
+from bcrypt import hashpw, gensalt, checkpw
 from sqlalchemy.orm.exc import NoResultFound
 
 
