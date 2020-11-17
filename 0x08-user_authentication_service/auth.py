@@ -92,16 +92,15 @@ class Auth:
 
     def update_password(self, reset_token: str, password: str) -> None:
         """Uses reset token to validate update of users password"""
-        if reset_token and password:
-            try:
-                user = self._db.find_user_by(reset_token=reset_token)
-                if user:
-                    hashed_password = _hash_password(password)
-                    self._db.update_user(user.id,
-                                         hashed_password=hashed_password,
-                                         reset_token=None)
-            except Exception:
-                raise ValueError
+        try:
+            found_user = self._db.find_user_by(reset_token=reset_token)
+        except NoResultFound:
+            raise ValueError
+        new_pswd = _hash_password(password)
+        self._db.update_user(
+            found_user.id,
+            hashed_password=new_pswd,
+            reset_token=None)
 
 
 def _generate_uuid() -> str:
