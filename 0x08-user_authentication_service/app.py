@@ -67,7 +67,7 @@ def login() -> str:
             return response
 
 
-@app.route('/sessions', methods=['DELETE'])
+@app.route('/sessions', methods=['DELETE'], strict_slashes=False)
 def log_out() -> str:
     """Find the user with the requested session ID.
     If the user exists destroy the session and redirect the user to GET /.
