@@ -95,12 +95,19 @@ def profile() -> str:
 @app.route('/reset_password', methods=['POST'], strict_slashes=False)
 def get_reset_password_token() -> str:
     """generate a token and respond with a 200 HTTP status"""
-    email = request.form.get('email')
-    resettoken = AUTH.get_reset_password_token(email)
-    if not resettoken:
+    try:
+        email = request.form['email']
+    except KeyError:
         abort(403)
-    else:
-        return jsonify({"email": email, "reset_token": resettoken}), 200
+
+    try:
+        reset_token = AUTH.get_reset_password_token(email)
+    except ValueError:
+        abort(403)
+
+    msg = {"email": email, "reset_token": reset_token}
+
+    return jsonify(msg), 200
 
 
 if __name__ == "__main__":
