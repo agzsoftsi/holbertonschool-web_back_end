@@ -9,6 +9,7 @@ import client
 from client import GithubOrgClient
 import requests
 from utils import access_nested_map, get_json, memoize
+import json
 
 
 class TestGithubOrgClient(TestCase):
