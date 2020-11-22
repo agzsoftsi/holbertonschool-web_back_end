@@ -24,3 +24,14 @@ class TestGithubOrgClient(TestCase):
         mock_json.assert_called_once_with(
             f"https://api.github.com/orgs/{org_name}"
             )
+
+    def test_public_repos_url(self):
+        ''' Test GithubOrgClient.public_repos_url property. '''
+
+        with mock.patch('client.GithubOrgClient._public_repos_url',
+                        new_callable=mock.PropertyMock) as m:
+            m.return_value = 'test'
+
+            goc = GithubOrgClient('buttercup')
+            pru = goc._public_repos_url
+            self.assertEqual(pru, 'test')
