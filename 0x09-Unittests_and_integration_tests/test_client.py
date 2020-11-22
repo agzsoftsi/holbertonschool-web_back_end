@@ -2,11 +2,13 @@
 """ Unittest module """
 
 from unittest import TestCase, mock
-from unittest.mock import patch, Mock
-from parameterized import parameterized
-
+from unittest.mock import patch, Mock, PropertyMock, call
+from parameterized import parameterized, parameterized_class
+from fixtures import TEST_PAYLOAD
 import client
 from client import GithubOrgClient
+import requests
+from utils import access_nested_map, get_json, memoize
 
 
 class TestGithubOrgClient(TestCase):
