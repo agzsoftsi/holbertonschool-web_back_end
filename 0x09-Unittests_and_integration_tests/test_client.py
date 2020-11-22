@@ -14,7 +14,7 @@ from utils import access_nested_map, get_json, memoize
 import json
 
 
-class TestGithubOrgClient(TestCase):
+class TestGithubOrgClient(unittest.TestCase):
     """ Class for testing GithubOrgClient """
 
     @parameterized.expand([
@@ -74,7 +74,7 @@ class TestGithubOrgClient(TestCase):
     ('org_payload', 'repos_payload', 'expected_repos', 'apache2_repos'),
     TEST_PAYLOAD
 )
-class TestIntegrationGithubOrgClient(TestCase):
+class TestIntegrationGithubOrgClient(unittest.TestCase):
     """ Integration test for github org client """
 
     @classmethod
