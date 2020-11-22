@@ -2,6 +2,7 @@
 """ Unittest module """
 
 from unittest
+from unittest import TestCase, mock
 from unittest.mock import patch, Mock, PropertyMock, call
 from parameterized import parameterized, parameterized_class
 from fixtures import TEST_PAYLOAD
@@ -73,7 +74,7 @@ class TestGithubOrgClient(TestCase):
     ('org_payload', 'repos_payload', 'expected_repos', 'apache2_repos'),
     TEST_PAYLOAD
 )
-class TestIntegrationGithubOrgClient(unittest.TestCase):
+class TestIntegrationGithubOrgClient(TestCase):
     """ Integration test for github org client """
 
     @classmethod
