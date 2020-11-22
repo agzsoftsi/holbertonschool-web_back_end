@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """ Unittest module """
 
-from unittest import TestCase, mock
+from unittest
 from unittest.mock import patch, Mock, PropertyMock, call
 from parameterized import parameterized, parameterized_class
 from fixtures import TEST_PAYLOAD
 import client
 from client import GithubOrgClient
 import requests
+import utils
 from utils import access_nested_map, get_json, memoize
 import json
 
