@@ -65,3 +65,55 @@ class TestGithubOrgClient(TestCase):
         """ unit-test for GithubOrgClient.has_license """
         result = GithubOrgClient.has_license(repo, license_key)
         self.assertEqual(result, expected)
+
+
+@parameterized_class(
+    ('org_payload', 'repos_payload', 'expected_repos', 'apache2_repos'),
+    TEST_PAYLOAD
+)
+class TestIntegrationGithubOrgClient(unittest.TestCase):
+    """ Integration test for github org client """
+
+    @classmethod
+    def setUpClass(cls):
+        """ prepare for testing """
+        org = TEST_PAYLOAD[0][0]
+        repos = TEST_PAYLOAD[0][1]
+        org_mock = Mock()
+        org_mock.json = Mock(return_value=org)
+        cls.org_mock = org_mock
+        repos_mock = Mock()
+        repos_mock.json = Mock(return_value=repos)
+        cls.repos_mock = repos_mock
+
+        cls.get_patcher = patch('requests.get')
+        cls.get = cls.get_patcher.start()
+
+        options = {cls.org_payload["repos_url"]: repos_mock}
+        cls.get.side_effect = lambda y: options.get(y, org_mock)
+
+    @classmethod
+    def tearDownClass(cls):
+        """ unprepare for testing """
+        cls.get_patcher.stop()
+
+    def test_public_repos(self):
+        """ public repos test """
+        y = GithubOrgClient("x")
+        self.assertEqual(y.org, self.org_payload)
+        self.assertEqual(y.repos_payload, self.repos_payload)
+        self.assertEqual(y.public_repos(), self.expected_repos)
+        self.assertEqual(y.public_repos("NONEXISTENT"), [])
+        self.get.assert_has_calls([call("https://api.github.com/orgs/x"),
+                                   call(self.org_payload["repos_url"])])
+
+    def test_public_repos_with_license(self):
+        """ public repos test """
+        y = GithubOrgClient("x")
+        self.assertEqual(y.org, self.org_payload)
+        self.assertEqual(y.repos_payload, self.repos_payload)
+        self.assertEqual(y.public_repos(), self.expected_repos)
+        self.assertEqual(y.public_repos("NONEXISTENT"), [])
+        self.assertEqual(y.public_repos("apache-2.0"), self.apache2_repos)
+        self.get.assert_has_calls([call("https://api.github.com/orgs/x"),
+                                   call(self.org_payload["repos_url"])])
