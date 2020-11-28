@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-11-28 16:05+0000\n"
+"POT-Creation-Date: 2020-11-28 16:30+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,11 +17,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.8.0\n"
 
-#: templates/3-index.html:8
+#: templates/3-index.html:8 templates/4-index.html:8
 msgid "home_title"
 msgstr ""
 
-#: templates/3-index.html:13
+#: templates/3-index.html:13 templates/4-index.html:13
 msgid "home_header"
 msgstr ""
 
