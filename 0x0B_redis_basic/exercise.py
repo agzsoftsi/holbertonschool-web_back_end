@@ -19,12 +19,3 @@ class Cache:
         key = str(uuid.uuid1())
         self._redis.mset({key: data})
         return key
-
-    def get(self, key: str, fn: Callable) -> Union[str, bytes, int, float]:
-        """Gets the value of a string and returns it converted to
-        the right type
-        """
-        if fn:
-            return fn(self._redis.get(key))
-        else:
-            return self._redis.get(key)
