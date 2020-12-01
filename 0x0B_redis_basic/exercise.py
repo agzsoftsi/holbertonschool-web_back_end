@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """ Add Task 0 -  Writing strings to Redis """
 import redis
-import uuid
+from uuid import uuid4
 from typing import Union, Callable
 
 
@@ -17,5 +17,5 @@ class Cache:
         """Stores input data in Redis using a random key
         """
         key = str(uuid4())
-        self._redis.set({key: data})
+        self._redis.set(key: data)
         return key
