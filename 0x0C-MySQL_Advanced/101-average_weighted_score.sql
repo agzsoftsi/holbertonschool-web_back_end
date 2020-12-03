@@ -1,0 +1,2 @@
+-- Task 13 - Average weighted score for all! -  computes and store the average weighted score for all students.
+-- Procedure ComputeAverageWeightedScoreForUsers is not taking any input.
