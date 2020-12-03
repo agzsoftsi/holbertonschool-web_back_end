@@ -1,0 +1,2 @@
+-- Task 12: Average weighted score - creates a stored procedure ComputeAverageWeightedScoreForUser that computes and store the average weighted score for a student.
+-- user_id, a users.id value (you can assume user_id is linked to an existing users)
