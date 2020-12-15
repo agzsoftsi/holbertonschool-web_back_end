@@ -10,7 +10,7 @@
 > - All your files should end with a new line
 > - A README.md file, at the root of the folder of the project, is mandatory
 > - Your code should use the js extension
-> - Your code will be tested using the Jest Testing Framework
+> - Your code will be tested using Jest and the command npm run test
 > - Your code will be analyzed using the linter ESLint along with specific rules that we’ll provide
 > - All of your functions must be exported
 
@@ -69,7 +69,29 @@ in your project directory:
 
 ```
 
-### package.json
+### babel.config.js
+
+### utils.js
+
+Use when you get to tasks requiring uploadPhoto and createUser.
+
+```sh
+export function uploadPhoto() {
+  return Promise.resolve({
+    status: 200,
+    body: 'photo-profile-1',
+  });
+}
+
+
+export function createUser() {
+  return Promise.resolve({
+    firstName: 'Guillaume',
+    lastName: 'Salva',
+  });
+}
+
+```
 
 ```sh
 module.exports = {
@@ -123,575 +145,378 @@ module.exports = {
     }
   ]
 };
+
 ```
 
 ### Finally…
 
-Don’t forget to run npm install from the terminal of your project folder to install all necessary project dependencies.
+Don’t forget to run $ npm install when you have the package.json
+
+### Response Data Format
+
+uploadPhoto returns a response with the format
+
+```sh
+{
+  status: 200,
+  body: 'photo-profile-1',
+}
+```
+
+createUser returns a response with the format
+
+```sh
+{
+  firstName: 'Guillaume',
+  lastName: 'Salva',
+}
+```
 
 ## Task
 
-**0. Const or let?**
-File: [0-constants.js](0-constants.js/) - [0-main.js](0-main.js/)
+**0. Keep every promise you make and only make promises you can keep**
+File: [0-promise.js](0-promise.js/) - [0-main.js](0-main.js/)
 
-Modify
-
-- function taskFirst to instantiate variables using const
-- function taskNext to instantiate variables using let
-
-```sh
-export function taskFirst() {
-  var task = 'I prefer const when I can.';
-  return task;
-}
-
-export function getLast() {
-  return ' is okay';
-}
-
-export function taskNext() {
-  var combination = 'But sometimes let';
-  combination += getLast();
-
-  return combination;
-}
-```
-
-Execution example:
+Return a Promise using this prototype function getResponseFromAPI()
 
 ```sh
 bob@dylan:~$ cat 0-main.js
-import { taskFirst, taskNext } from './0-constants.js';
+import getResponseFromAPI from "./0-promise.js";
 
-console.log(`${taskFirst()} ${taskNext()}`);
+const response = getResponseFromAPI();
+console.log(response instanceof Promise);
 
 bob@dylan:~$ 
 bob@dylan:~$ npm run dev 0-main.js 
-I prefer const when I can. But sometimes let is okay
+true
 bob@dylan:~$ 
 ```
 
-**1. Block Scope**
-File: [1-block-scoped.js](1-block-scoped.js/) - [1-main.js](1-main.js/)
+**1. Don't make a promise...if you know you can't keep it**
+File: [1-promise.js](1-promise.js/) - [1-main.js](1-main.js/)
 
-Given what you’ve read about var and hoisting, modify the variables inside the function taskBlock so that the variables aren’t overwritten inside the conditional block.
+Using the prototype below, return a promise. The parameter is a boolean.
 
 ```sh
-export default function taskBlock(trueOrFalse) {
-  var task = false;
-  var task2 = true;
-
-  if (trueOrFalse) {
-    var task = true;
-    var task2 = false;
-  }
-
-  return [task, task2];
-}
+getFullResponseFromAPI(success)
 ```
-Execution:
+When the argument is:
+
+- true
+> - resolve the promise by passing an object with 2 attributes:
+> > - status: 200
+> > - body: 'Success'
+- false
+> - reject the promise with an error object with the message The fake API is not working currently
+
+Try testing it out for yourself
 
 ```sh
 bob@dylan:~$ cat 1-main.js
-import taskBlock from './1-block-scoped.js';
+import getFullResponseFromAPI from './1-promise';
 
-console.log(taskBlock(true));
-console.log(taskBlock(false));
-bob@dylan:~$
+console.log(getFullResponseFromAPI(true));
+console.log(getFullResponseFromAPI(false));
+
+bob@dylan:~$ 
 bob@dylan:~$ npm run dev 1-main.js 
-[ true, false ]
-[ false, true ]
-bob@dylan:~$
+Promise { { status: 200, body: 'Success' } }
+Promise {
+  <rejected> Error: The fake API is not working currently
+    ...
+    ...
+bob@dylan:~$ 
 ```
 
-**2. Arrow functions**
-File: [2-arrow.js](2-arrow.js/) - [2-main.js](2-main.js/)
+**2. Catch me if you can! **
+File: [2-then.js](2-then.js/) - [2-main.js](2-main.js/)
 
-Rewrite the following standard function to use ES6’s arrow syntax of the function add (it will be an anonymous function after)
+Using the function prototype below
 
 ```sh
-export default function getNeighborhoodsList() {
-  this.sanFranciscoNeighborhoods = ['SOMA', 'Union Square'];
-
-  const self = this;
-  this.addNeighborhood = function add(newNeighborhood) {
-    self.sanFranciscoNeighborhoods.push(newNeighborhood);
-    return self.sanFranciscoNeighborhoods;
-  };
-}
+function handleResponseFromAPI(promise)
 ```
-Execution:
+Append three handlers to the function:
+
+- When the Promise resolves, return an object with the following attributes
+> - status: 200
+> - body: success
+- When the Promise rejects, return an empty Error object
+- For every resolution, log Got a response from the API to the console
 
 ```sh
 bob@dylan:~$ cat 2-main.js
-import getNeighborhoodsList from './2-arrow.js';
+import handleResponseFromAPI from "./2-then";
 
-const neighborhoodsList = new getNeighborhoodsList();
-const res = neighborhoodsList.addNeighborhood('Noe Valley');
-console.log(res);
-bob@dylan:~$
+const promise = Promise.resolve();
+handleResponseFromAPI(promise);
+
+bob@dylan:~$ 
 bob@dylan:~$ npm run dev 2-main.js 
-[ 'SOMA', 'Union Square', 'Noe Valley' ]
-bob@dylan:~$
+Got a response from the API
+bob@dylan:~$ 
 ```
 
-**3. Parameter defaults**
-File: [3-default-parameter.js](3-default-parameter.js/) - [3-main.js](3-main.js/)
+**3. Handle multiple successful promises**
+File: [3-all.js](3-all.js/) - [3-main.js](3-main.js/)
 
-Condense the internals of the following function to 1 line - without changing the name of each function/variable.
+In this file, import uploadPhoto and createUser from utils.js
 
-Hint: The key here to define default parameter values for the function parameters.
+Knowing that the functions in utils.js return promises, use the prototype below to collectively resolve all promises and log body firstName lastName to the console.
 
 ```sh
-export default function getSumOfHoods(initialNumber, expansion1989, expansion2019) {
-  if (expansion1989 === undefined) {
-    expansion1989 = 89;
-  }
-
-  if (expansion2019 === undefined) {
-    expansion2019 = 19;
-  }
-  return initialNumber + expansion1989 + expansion2019;
-}
+function handleProfileSignup()
 ```
 
-Execution:
+In the event of an error, log Signup system offline to the console
 
 ```sh
 bob@dylan:~$ cat 3-main.js
-import getSumOfHoods from './3-default-parameter.js';
+import handleProfileSignup from "./3-all";
 
-console.log(getSumOfHoods(34));
-console.log(getSumOfHoods(34, 3));
-console.log(getSumOfHoods(34, 3, 4));
-bob@dylan:~$
+handleProfileSignup();
+
+bob@dylan:~$ 
 bob@dylan:~$ npm run dev 3-main.js 
-142
-56
-41
-bob@dylan:~$
+photo-profile-1 Guillaume Salva
+bob@dylan:~$ 
 ```
 
-**4. Rest parameter syntax for functions**
-File: [4-rest-parameter.js](4-rest-parameter.js/) - [4-main.js](4-main.js/)
+**4. Simple promise**
+File: [4-user-promise.js](4-user-promise.js/) - [4-main.js](4-main.js/)
 
-Modify the following function to return the number of arguments passed to it using the rest parameter syntax
+Using the following prototype
 
 ```sh
-export default function returnHowManyArguments() {
-
+function signUpUser(firstName, lastName) {
 }
 ```
-Example
+That returns a resolved promise with this object:
 
 ```sh
-> returnHowManyArguments("Hello", "Holberton", 2020);
-3
->
+{
+  firstName: value,
+  lastName: value,
+}
 ```
-Execution:
 
 ```sh
 bob@dylan:~$ cat 4-main.js
-import returnHowManyArguments from './4-rest-parameter.js';
+import signUpUser from "./4-user-promise";
 
-console.log(returnHowManyArguments("one"));
-console.log(returnHowManyArguments("one", "two", 3, "4th"));
-bob@dylan:~$
+console.log(signUpUser("Bob", "Dylan"));
+
+bob@dylan:~$ 
 bob@dylan:~$ npm run dev 4-main.js 
-1
-4
-bob@dylan:~$
+Promise { { firstName: 'Bob', lastName: 'Dylan' } }
+bob@dylan:~$ 
 ```
 
-**5. The wonders of spread syntax**
-File: [5-spread-operator.js](5-spread-operator.js/) - [5-main.js](5-main.js/)
+**5. Reject the promises**
+File: [5-photo-reject.js](5-photo-reject.js/) - [5-main.js](5-main.js/)
 
-Using spread syntax, concatenate 2 arrays and each character of a string by modifying the function below. Your function body should be one line long.
+Write and export a function named uploadPhoto. It should accept one argument fileName (string).
+
+The function should return a Promise rejecting with an Error and the string $fileName cannot be processed
 
 ```sh
-export default function concatArrays(array1, array2, string) {
+export default function uploadPhoto(filename) {
+
 }
 ```
-Execution:
 
 ```sh
 bob@dylan:~$ cat 5-main.js
-import concatArrays from './5-spread-operator.js';
+import uploadPhoto from './5-photo-reject';
 
-console.log(concatArrays(['a', 'b'], ['c', 'd'], 'Hello'));
+console.log(uploadPhoto('guillaume.jpg'));
 
-bob@dylan:~$
+bob@dylan:~$ 
 bob@dylan:~$ npm run dev 5-main.js 
-[
-  'a', 'b', 'c',
-  'd', 'H', 'e',
-  'l', 'l', 'o'
-]
-bob@dylan:~$
+Promise {
+  <rejected> Error: guillaume.jpg cannot be processed
+  ..
+    ..
+bob@dylan:~$ 
 ```
 
-**6. Take advantage of template literals**
-File: [6-string-interpolation.js](6-string-interpolation.js/) - [6-main.js](6-main.js/)
+**6. Handle multiple promises**
+File: [6-final-user.js](6-final-user.js/) - [6-main.js](6-main.js/)
 
-Rewrite the return statement to use a template literal so you can the substitute the variables you’ve defined.
+Import signUpUser from 4-user-promise.js and uploadPhoto from 5-photo-reject.js.
+
+Write and export a function named handleProfileSignup. It should accept three arguments firstName (string), lastName (string), and fileName (string). The function should call the two other functions. When the promises are all settled it should return an array with the following structure:
 
 ```sh
-export default function getSanFranciscoDescription() {
-  const year = 2017;
-  const budget = {
-    income: '$119,868',
-    gdp: '$154.2 billion',
-    capita: '$178,479',
-  };
-
-  return 'As of ' + year + ', it was the seventh-highest income county in the United States'
-        / ', with a per capita personal income of ' + budget.income + '. As of 2015, San Francisco'
-        / ' proper had a GDP of ' + budget.gdp + ', and a GDP per capita of ' + budget.capita + '.';
-} 
+[
+    {
+      status: status_of_the_promise,
+      value: value or error returned by the Promise
+    },
+    ...
+  ]
 ```
-Execution:
 
 ```sh
 bob@dylan:~$ cat 6-main.js
-import getSanFranciscoDescription from './6-string-interpolation.js';
+import handleProfileSignup from './6-final-user';
 
-console.log(getSanFranciscoDescription());
+console.log(handleProfileSignup("Bob", "Dylan", "bob_dylan.jpg"));
 
-bob@dylan:~$
+bob@dylan:~$ 
 bob@dylan:~$ npm run dev 6-main.js 
-As of 2017, it was the seventh-highest income county in the United States, with a per capita personal income of $119,868. As of 2015, San Francisco proper had a GDP of $154.2 billion, and a GDP per capita of $178,479.
-bob@dylan:~$
+Promise { <pending> }
+bob@dylan:~$ 
 ```
 
-**7. Object property value shorthand syntax**
-File: [7-getBudgetObject.js](7-getBudgetObject.js/) - [7-main.js](7-main.js/)
+**7. Load balancer**
+File: [7-load_balancer.js](7-load_balancer.js/) - [7-main.js](7-main.js/)
 
-Notice how the keys and the variable names are the same?
+Write and export a function named loadBalancer. It should accept two arguments chinaDownload (Promise) and USDownload (Promise).
 
-Modify the following function’s budget object to simply use the keyname instead.
+The function should return the value returned by the promise that resolved the first.
 
 ```sh
-export default function getBudgetObject(income, gdp, capita) {
-  const budget = {
-    income: income,
-    gdp: gdp,
-    capita: capita,
-  };
+export default function loadBalancer(chinaDownload, USDownload) {
 
-  return budget;
 }
 ```
-Execution:
 
 ```sh
 bob@dylan:~$ cat 7-main.js
-import getBudgetObject from './7-getBudgetObject.js';
+import loadBalancer from "./7-load_balancer";
 
-console.log(getBudgetObject(400, 700, 900));
+const ukSuccess = 'Downloading from UK is faster';
+const frSuccess = 'Downloading from FR is faster';
 
-bob@dylan:~$
+const promiseUK = new Promise(function(resolve, reject) {
+    setTimeout(resolve, 100, ukSuccess);
+});
+
+const promiseUKSlow = new Promise(function(resolve, reject) {
+    setTimeout(resolve, 400, ukSuccess);
+});
+
+const promiseFR = new Promise(function(resolve, reject) {
+    setTimeout(resolve, 200, frSuccess);
+});
+
+const test = async () => {
+    console.log(await loadBalancer(promiseUK, promiseFR));
+    console.log(await loadBalancer(promiseUKSlow, promiseFR));
+}
+
+test();
+
+bob@dylan:~$ 
 bob@dylan:~$ npm run dev 7-main.js 
-{ income: 400, gdp: 700, capita: 900 }
-bob@dylan:~$
+Downloading from UK is faster
+Downloading from FR is faster
+bob@dylan:~$ 
 ```
 
-**8. No need to create empty objects before adding in properties**
-File: [8-getBudgetCurrentYear.js](8-getBudgetCurrentYear.js/) - [8-main.js](8-main.js/)
+**8. Throw error / try catch**
+File: [8-try.js](8-try.js/) - [8-main.js](8-main.js/)
 
-Rewrite the getBudgetForCurrentYear function to use ES6 computed property names on the budget object
+Write a function named divideFunction that will accept two arguments: numerator (Number) and denominator (Number).
+
+When the denominator argument is equal to 0, the function should throw a new error with the message cannot divide by 0. Otherwise it should return the numerator divided by the denominator.
 
 ```sh
-function getCurrentYear() {
-  const date = new Date();
-  return date.getFullYear();
-}
+export default function divideFunction(numerator, denominator) {
 
-export default function getBudgetForCurrentYear(income, gdp, capita) {
-  const budget = {};
-
-  budget[`income-${getCurrentYear()}`] = income;
-  budget[`gdp-${getCurrentYear()}`] = gdp;
-  budget[`capita-${getCurrentYear()}`] = capita;
-
-  return budget;
 }
 ```
-Execution:
 
 ```sh
 bob@dylan:~$ cat 8-main.js
-import getBudgetForCurrentYear from './8-getBudgetCurrentYear.js';
+import divideFunction from './8-try';
 
-console.log(getBudgetForCurrentYear(2100, 5200, 1090));
+console.log(divideFunction(10, 2));
+console.log(divideFunction(10, 0));
 
-bob@dylan:~$
+bob@dylan:~$ 
 bob@dylan:~$ npm run dev 8-main.js 
-{ 'income-2020': 2100, 'gdp-2020': 5200, 'capita-2020': 1090 }
-bob@dylan:~$
+5
+..../8-try.js:15
+  throw Error('cannot divide by 0');
+  ^
+.....
+
+bob@dylan:~$ 
 ```
 
-**9. ES6 method properties**
-File: [9-getFullBudget.js](9-getFullBudget.js/) - [9-main.js](9-main.js/)
+**9. Throw an error**
+File: [9-try.js](9-try.js/) - [9-main.js](9-main.js/)
 
-Rewrite getFullBudgetObject to use ES6 method properties in the fullBudget object
+Write a function named guardrail that will accept one argument mathFunction (Function).
+
+This function should create and return an array named queue.
+
+When the mathFunction function is executed, the value returned by the function should be appended to the queue. If this function throws an error, the error message should be appended to the queue. In every case, the message Guardrail was processed should be added to the queue.
+
+Example:
 
 ```sh
-import getBudgetObject from './7-getBudgetObject.js';
-
-export default function getFullBudgetObject(income, gdp, capita) {
-  const budget = getBudgetObject(income, gdp, capita);
-  const fullBudget = {
-    ...budget,
-    getIncomeInDollars: function (income) {
-      return `$${income}`;
-    },
-    getIncomeInEuros: function (income) {
-      return `${income} euros`;
-    },
-  };
-
-  return fullBudget;
-}
+[
+  1000,
+  'Guardrail was processed',
+]
 ```
-Execution:
 
 ```sh
 bob@dylan:~$ cat 9-main.js
-import getFullBudgetObject from './9-getFullBudget.js';
+import guardrail from './9-try';
+import divideFunction from './8-try';
 
-const fullBudget = getFullBudgetObject(20, 50, 10);
+console.log(guardrail(() => { return divideFunction(10, 2)}));
+console.log(guardrail(() => { return divideFunction(10, 0)}));
 
-console.log(fullBudget.getIncomeInDollars(fullBudget.income));
-console.log(fullBudget.getIncomeInEuros(fullBudget.income));
-
-bob@dylan:~$
+bob@dylan:~$ 
 bob@dylan:~$ npm run dev 9-main.js 
-$20
-20 euros
-bob@dylan:~$
+[ 5, 'Guardrail was processed' ]
+[ 'Error: cannot divide by 0', 'Guardrail was processed' ]
+bob@dylan:~$ 
 ```
 
-**10. For...of Loops**
-File: [10-loops.js](10-loops.js/) - [10-main.js](10-main.js/)
+**10. Await / Async**
+File: [100-await.js](100-await.js/) - [100-main.js](100-main.js/)
 
-Rewrite the function appendToEachArrayValue to use ES6’s for...of operator. And don’t forget that var is not ES6-friendly.
+Import uploadPhoto and createUser from utils.js
 
-```sh
-export default function appendToEachArrayValue(array, appendString) {
-  for (var idx in array) {
-    var value = array[idx];
-    array[idx] = appendString + value;
-  }
-
-  return array;
-}
-```
-Execution:
-
-```sh
-bob@dylan:~$ cat 10-main.js
-import appendToEachArrayValue from './10-loops.js';
-
-console.log(appendToEachArrayValue(['appended', 'fixed', 'displayed'], 'correctly-'));
-
-bob@dylan:~$
-bob@dylan:~$ npm run dev 10-main.js 
-[ 'correctly-appended', 'correctly-fixed', 'correctly-displayed' ]
-bob@dylan:~$
-```
-
-**11. Iterator**
-File: [11-createEmployeesObject.js](11-createEmployeesObject.js/) - [11-main.js](11-main.js/)
-
-Write a function named createEmployeesObject that will receive two arguments:
-
-- departmentName (String)
-- employees (Array of Strings)
-
-```sh
-export default function createEmployeesObject(departmentName, employees) {
-
-}
-```
-The function should return an object with the following format:
+Write an async function named asyncUploadUser that will call these two functions and return an object with the following format:
 
 ```sh
 {
-     $departmentName: [
-          $employees,
-     ],
+  photo: response_from_uploadPhoto_function,
+  user: response_from_createUser_function,
 }
 ```
-Execution:
-
-```sh
-bob@dylan:~$ cat 11-main.js
-import createEmployeesObject from './11-createEmployeesObject.js';
-
-console.log(createEmployeesObject("Software", [ "Bob", "Sylvie" ]));
-
-bob@dylan:~$
-bob@dylan:~$ npm run dev 11-main.js 
-{ Software: [ 'Bob', 'Sylvie' ] }
-bob@dylan:~$
-```
-
-**12. Let's create a report object**
-File: [12-createReportObject.js](12-createReportObject.js/) - [12-main.js](12-main.js/)
-
-Write a function named createReportObject whose parameter, employeesList, is the return value of the previous function createEmployeesObject.
-
-```sh
-export default function createReportObject(employeesList) {
-
-}
-```
-createReportObject should return an object containing the key allEmployees and a method property called getNumberOfDepartments.
-
-allEmployees is a key that maps to an object containing the department name and a list of all the employees in that department. If you’re having trouble, use the spread syntax.
-
-The method property receives employeesList and returns the number of departments. I would suggest suggest thinking back to the ES6 method property syntax.
+If one of the async function fails, return an empty object. Example:
 
 ```sh
 {
-  allEmployees: {
-     engineering: [
-          'John Doe',
-          'Guillaume Salva',
-     ],
-  },
-};
-```
-
-Execution:
-
-```sh
-bob@dylan:~$ cat 12-main.js
-import createEmployeesObject from './11-createEmployeesObject.js';
-import createReportObject from './12-createReportObject.js';
-
-const employees = {
-    ...createEmployeesObject('engineering', ['Bob', 'Jane']),
-    ...createEmployeesObject('marketing', ['Sylvie'])
-};      
-
-const report = createReportObject(employees);
-console.log(report.allEmployees);
-console.log(report.getNumberOfDepartments(report.allEmployees));
-
-bob@dylan:~$
-bob@dylan:~$ npm run dev 12-main.js 
-{ engineering: [ 'Bob', 'Jane' ], marketing: [ 'Sylvie' ] }
-2
-bob@dylan:~$
-```
-
-**13. Iterating through report objects**
-File: [100-createIteratorObject.js](100-createIteratorObject.js/) - [100-main.js](100-main.js/)
-
-Write a function named createIteratorObject, that will take into argument a report Object created with the previous function createReportObject.
-
-This function will return an iterator to go through every employee in every department.
-
-```sh
-export default function createIteratorObject(report) {
-
+  photo: null,
+  user: null,
 }
 ```
-Execution:
 
 ```sh
 bob@dylan:~$ cat 100-main.js
-import createIteratorObject from "./100-createIteratorObject.js";
+import asyncUploadUser from "./100-await";
 
-import createEmployeesObject from './11-createEmployeesObject.js';
-import createReportObject from './12-createReportObject.js';
-
-const employees = {
-    ...createEmployeesObject('engineering', ['Bob', 'Jane']),
-    ...createEmployeesObject('marketing', ['Sylvie'])
+const test = async () => {
+    const value = await asyncUploadUser();
+    console.log(value);
 };
 
-const report = createReportObject(employees);
+test();
 
-const reportWithIterator = createIteratorObject(report);
-
-for (const item of reportWithIterator) {
-    console.log(item);
-}
-
-bob@dylan:~$
+bob@dylan:~$ 
 bob@dylan:~$ npm run dev 100-main.js 
-Bob
-Jane
-Sylvie
-bob@dylan:~$
-```
-
-**14. Iterate through object**
-File: [101-iterateThroughObject.js](101-iterateThroughObject.js/) - [101-main.js](101-main.js/)
-
-Finally, write a function named iterateThroughObject. The function’s parameter reportWithIterator is the return value from createIteratorObject.
-
-```sh
- export default function iterateThroughObject(reportWithIterator) {
-
- }
-```
-It should return every employee name in a string, separated by |
-
-```sh
 {
-  allEmployees: {
-     engineering: [
-          'John Doe',
-          'Guillaume Salva',
-     ],
-  },
-  ...
-};
-```
-Should return John Doe | Guillaume Salva
-
-Reminder - the functions will be imported by the test suite.
-
-Full example:
-
-```sh
-> employees = {
-      ...createEmployeesObject('engineering', engineering),
-      ...createEmployeesObject('design', design),
-    };
->
-> const report = createReportObject(employees);
-> const reportWithIterator = createIteratorObject(report);
-> iterateThroughObject(reportWithIterator)
-'John Doe | Guillaume Salva | Kanye East | Jay Li'
-> 
-```
-Execution:
-
-```sh
-bob@dylan:~$ cat 101-main.js
-import createEmployeesObject from "./11-createEmployeesObject.js";
-import createReportObject from './12-createReportObject.js';
-import createIteratorObject from './100-createIteratorObject.js';
-import iterateThroughObject from './101-iterateThroughObject.js';
-
-
-const employees = {
-    ...createEmployeesObject('engineering', ['Bob', 'Jane']),
-    ...createEmployeesObject('marketing', ['Sylvie'])
-};
-
-const report = createReportObject(employees);
-const reportWithIterator = createIteratorObject(report);
-
-console.log(iterateThroughObject(reportWithIterator));
-
-bob@dylan:~$
-bob@dylan:~$ npm run dev 101-main.js 
-Bob | Jane | Sylvie
-bob@dylan:~$
+  photo: { status: 200, body: 'photo-profile-1' },
+  user: { firstName: 'Guillaume', lastName: 'Salva' }
+}
+bob@dylan:~$ 
 ```
