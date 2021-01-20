@@ -1,6 +1,6 @@
-import createPushNotificationsJobs from './8-job';
 import kue from 'kue';
 import { expect } from 'chai';
+import createPushNotificationsJobs from './8-job';
 
 const queue = kue.createQueue();
 
@@ -12,15 +12,15 @@ const jobs = [
 ];
 
 describe('createPushNotificationsJobs', () => {
-  before(function () {
+  before(() => {
     queue.testMode.enter();
   });
 
-  afterEach(function () {
+  afterEach(() => {
     queue.testMode.clear();
   });
 
-  after(function () {
+  after(() => {
     queue.testMode.exit();
   });
 
